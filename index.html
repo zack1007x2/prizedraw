@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+
+	<title>抽獎</title>
+	<link rel="shortcut icon" href="https://zack1007x2.github.io/assets/images/icon.png"/>
+	<meta property="og:url" content="" />
+	<meta property="og:site_name" content="抽獎" />
+	<meta property="og:title" content="抽獎" />
+	<meta property="og:image" content="https://3.bp.blogspot.com/-V2CsYyp07gI/V115OnvKPQI/AAAAAAAAFAo/61NnKx5ZPtwhDnPSfyEQcpFnx3hSYj0PACPcB/s1600/IMG_4115.JPG" />
+	<meta itemprop="image" content="https://3.bp.blogspot.com/-V2CsYyp07gI/V115OnvKPQI/AAAAAAAAFAo/61NnKx5ZPtwhDnPSfyEQcpFnx3hSYj0PACPcB/s1600/IMG_4115.JPG">
+
+
+	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css'/>
+	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'/>
+	<link rel="stylesheet" href="assets/css/main.css">
+
+</head>
+<body>
+
+	<!--  背景圖  -->
+	<main class="full-block">
+		
+		<!--  主要內容  -->
+		<div class="main-block">
+
+			<!--  顯示區塊  -->
+			<section class="god">
+				<h1>
+					<span class="wrap">
+						<span>抽獎</span>
+					</span>
+				</h1>
+			</section>
+
+			<!--  按鈕  -->
+			<section class="btns">
+
+				<!--  start  -->
+				<a class="btn-start" href="#">
+					<span class="line top -h"></span>
+					<span class="line right -v"></span>
+					<span class="line bottom -h"></span>
+					<span class="line left -v"></span>
+				</a>
+			</section>
+
+		</div>
+	</main>
+
+	
+
+	<script>
+
+		// Maps Embed API、Google Sheets API 的 金鑰
+		// 可由 https://console.developers.google.com/apis 申請
+		const embedApiKey = 'AIzaSyDs7sflAzkfolZw64u7ngsGe-Vc9RR_dUA';
+
+		const uri = 'https://sheets.googleapis.com/v4/spreadsheets/1SW88Nsa_Z_Oo4JbOzWD9TAejI9OOaNLrWNFrv05Z9eg/values/prize?alt=json&key=' + embedApiKey;
+
+		const duration = 2000; // 拉霸效果執行多久
+
+		fetch(uri)
+			.then(res => res.json())
+			.then(data => {
+				
+				let prize = []; 
+
+				
+				const d = data.values, len =  d.length;
+				
+				for(let i = 0; i < len; i++) {
+					prize.push(d[i][0])
+				}
+				
+				shuffle(prize)
+
+				// 點擊按鈕後執行
+				let r; // 亂數
+				let max, min; // 陣列的最大、小值
+				let txt; // 結果
+
+
+				// 按鈕
+				const btn = document.querySelector('.btn-start');
+				
+				btn.addEventListener('click', e => {
+					e.preventDefault();
+
+					// 選店家 fn
+					const chooseShop = toggle => {
+
+						// 取亂數 fn
+						r = () => {
+							max = prize.length - 1;
+							min = 0;
+							return Math.floor(Math.random() * (max - min + 1)) + min;
+						};
+
+						// 清空、插入選項
+						let input = document.querySelector('.wrap');
+						input.innerHTML = '';
+						for(let i = 0; i < prize.length; i++) {
+							input.insertAdjacentHTML('beforeend', '<span>' + toggle[i] + '</span>');
+						}
+
+						// 禁止按鈕再被點擊
+						// e.target.classList.add('not-allow');
+						// btn.attr('disabled', 'true');
+
+						// 加入動畫 class name
+						const list = document.querySelectorAll('.wrap > span');
+						Array.prototype.forEach.call(list, l => l.classList.add('span-' + (toggle.length - 1)));
+
+						// 亂數決定中選店家
+						r = r()
+						txt = prize[r];
+						list[0].innerText = txt;
+						prize.splice(r,1)
+
+						// 移除動畫
+						setTimeout(() => {
+							// 停止拉霸動畫
+							Array.prototype.forEach.call(list, l => l.removeAttribute('class'));	
+
+						}, duration);
+
+						// e.target.classList.remove('not-allow');
+						// btn.attr('disabled', 'false');
+
+						
+					};
+
+					chooseShop(prize);
+
+				}, false);
+
+			})
+
+			function shuffle(array) {
+			  for (let i = array.length - 1; i > 0; i--) {
+			    let j = Math.floor(Math.random() * (i + 1));
+			    [array[i], array[j]] = [array[j], array[i]];
+			  }
+			}
+
+	</script>
+</body>
+</html>
